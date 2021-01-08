@@ -6,7 +6,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, EditUser
-from models import db, connect_db, User, Message
+from models import db, connect_db, User, Message, Likes
 
 CURR_USER_KEY = "curr_user"
 
@@ -223,7 +223,20 @@ def profile():
             return render_template('/users/edit.html', form=form)
 
     return render_template('/users/edit.html', form=form)
-        
+
+
+@app.route('/users/add_like/<int:message_id>', methods=["POST"])  
+def like_warble(message_id):
+    msg = Message.query.get(message_id)
+    user = msg.user_id
+    if user != g.user.id:
+        like = Likes(user_id=user, message_id=msg.id)
+        db.session.add(like)
+        db.session.commit()
+        return redirect('/')
+    else:
+        flash("You cannot 'like' your own warble", "danger")
+        return redirect("/")
 
 
 

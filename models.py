@@ -26,7 +26,6 @@ class Follows(db.Model):
         primary_key=True,
     )
 
-
 class Likes(db.Model):
     """Mapping user likes to warbles."""
 
@@ -198,6 +197,7 @@ class Message(db.Model):
     )
 
     user = db.relationship('User')
+
 
 
 def connect_db(app):

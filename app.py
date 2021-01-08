@@ -1,14 +1,16 @@
 import os
 
 from flask import Flask, render_template, request, flash, redirect, session, g
+from flask_bcrypt import Bcrypt
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserAddForm, LoginForm, MessageForm
+from forms import UserAddForm, LoginForm, MessageForm, EditUser
 from models import db, connect_db, User, Message
 
 CURR_USER_KEY = "curr_user"
 
+bcrypt = Bcrypt()
 app = Flask(__name__)
 
 # Get DB_URI from environ variable (useful for production/testing) or,
@@ -80,9 +82,7 @@ def signup():
         except IntegrityError:
             flash("Username already taken", 'danger')
             return render_template('users/signup.html', form=form)
-
         do_login(user)
-
         return redirect("/")
 
     else:
@@ -112,12 +112,9 @@ def login():
 @app.route('/logout')
 def logout():
     """Handle logout of user."""
-
-    # IMPLEMENT THIS
-
-
-##############################################################################
-# General user routes:
+    do_logout()
+    flash("Success!", "success")
+    return redirect("/login")
 
 @app.route('/users')
 def list_users():
@@ -168,6 +165,7 @@ def show_following(user_id):
 @app.route('/users/<int:user_id>/followers')
 def users_followers(user_id):
     """Show list of followers of this user."""
+    """SHOW PEOPLE WHO ARE FOLLOWING THIS USER"""
 
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -210,8 +208,23 @@ def stop_following(follow_id):
 @app.route('/users/profile', methods=["GET", "POST"])
 def profile():
     """Update profile for current user."""
+    form = EditUser(obj=g.user)
+    if g.user and form.validate_on_submit():
+        if bcrypt.check_password_hash(g.user.password, form.password.data):
+            g.user.username = form.username.data
+            g.user.email = form.email.data
+            g.user.image_url = form.image_url.data
+            g.user.header_image_url = form.header_image_url.data
+            g.user.bio = form.bio.data
+            db.session.commit()
+            return redirect(f'/users/{g.user.id}')
+        else:
+            flash("Invalid Password", "danger")
+            return render_template('/users/edit.html', form=form)
 
-    # IMPLEMENT THIS
+    return render_template('/users/edit.html', form=form)
+        
+
 
 
 @app.route('/users/delete', methods=["POST"])
@@ -292,8 +305,10 @@ def homepage():
     """
 
     if g.user:
+        following_ids = [f.id for f in g.user.following] + [g.user.id]
         messages = (Message
                     .query
+                    .filter(Message.user_id.in_(following_ids))
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())

@@ -230,7 +230,7 @@ def like_warble(message_id):
     msg = Message.query.get(message_id)
     user = msg.user_id
     if user != g.user.id:
-        like = Likes(user_id=user, message_id=msg.id)
+        like = Likes(user_id=g.user.id, message_id=msg.id)
         db.session.add(like)
         db.session.commit()
         return redirect('/')

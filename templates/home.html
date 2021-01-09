@@ -37,6 +37,12 @@
         </div>
       </div>
     </aside>
+    <li class="stat">
+      <p class="small">Warblers Liked</p>
+      <h4>
+        <a href="/users/{{ g.user.id }}/following">{{ g.user.likes | length }}</a>
+      </h4>
+    </li>
 
     <div class="col-lg-6 col-md-8 col-sm-12">
       <ul class="list-group" id="messages">
@@ -60,7 +66,7 @@
                 <i class="fa fa-thumbs-up"></i> 
               </button>
             </form>
-              {% for like in likes %}
+              {% for like in g.user.likes %}
                 {% if msg.id == like.message_id %}
                 <form method="POST" action="/users/delete_like/{{ like.id }}" id="messages-form">
                   <button class="btn btn-sm heart">

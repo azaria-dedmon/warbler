@@ -197,6 +197,7 @@ class Message(db.Model):
     )
 
     user = db.relationship('User')
+    
 
 
 

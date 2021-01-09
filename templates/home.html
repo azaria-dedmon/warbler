@@ -14,6 +14,7 @@
                  class="card-image">
             <p>@{{ g.user.username }}</p>
           </a>
+              <p>Warbles Liked <a href="/users/show_likes">{{ g.user.likes | length }}</a> </p>
           <ul class="user-stats nav nav-pills">
             <li class="stat">
               <p class="small">Messages</p>
@@ -37,12 +38,6 @@
         </div>
       </div>
     </aside>
-    <li class="stat">
-      <p class="small">Warblers Liked</p>
-      <h4>
-        <a href="/users/{{ g.user.id }}/following">{{ g.user.likes | length }}</a>
-      </h4>
-    </li>
 
     <div class="col-lg-6 col-md-8 col-sm-12">
       <ul class="list-group" id="messages">

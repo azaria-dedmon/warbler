@@ -239,12 +239,30 @@ def like_warble(message_id):
         return redirect("/")
 
 
+
 @app.route('/users/delete_like/<int:like_id>', methods=["POST"])
 def delete_liked(like_id):
     msg = Likes.query.get(like_id)
     db.session.delete(msg)
     db.session.commit()
     return redirect('/')
+
+
+
+@app.route('/users/show_likes')
+def show_liked_warbles():
+    if g.user:
+        likes = Likes.query.all()
+        following_ids = [f.id for f in g.user.following] + [g.user.id]
+        messages = (Message
+                    .query
+                    .filter(Message.user_id.in_(following_ids))
+                    .order_by(Message.timestamp.desc())
+                    .limit(100)
+                    .all())
+    return render_template('/users/show_liked_warbles.html', likes=likes, messages=messages)
+    
+
 
 
 @app.route('/users/delete', methods=["POST"])

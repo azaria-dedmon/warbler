@@ -170,6 +170,10 @@ nav + .container {
   margin-left: -15px;
 }
 
+.heart{
+  margin-top: 35px;
+}
+
 #profile-image {
   margin: 0 auto 15px;
   width: 100%;

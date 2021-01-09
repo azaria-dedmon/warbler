@@ -239,6 +239,13 @@ def like_warble(message_id):
         return redirect("/")
 
 
+@app.route('/users/delete_like/<int:like_id>', methods=["POST"])
+def delete_liked(like_id):
+    msg = Likes.query.get(like_id)
+    db.session.delete(msg)
+    db.session.commit()
+    return redirect('/')
+
 
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
@@ -325,8 +332,8 @@ def homepage():
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
-
-        return render_template('home.html', messages=messages)
+        likes = Likes.query.all()
+        return render_template('home.html', messages=messages, likes=likes)
 
     else:
         return render_template('home-anon.html')

@@ -20,7 +20,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
+# app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 toolbar = DebugToolbarExtension(app)
 
@@ -165,7 +165,6 @@ def show_following(user_id):
 @app.route('/users/<int:user_id>/followers')
 def users_followers(user_id):
     """Show list of followers of this user."""
-    """SHOW PEOPLE WHO ARE FOLLOWING THIS USER"""
 
     if not g.user:
         flash("Access unauthorized.", "danger")
@@ -227,6 +226,7 @@ def profile():
 
 @app.route('/users/add_like/<int:message_id>', methods=["POST"])  
 def like_warble(message_id):
+    """Add likes to followers warbles"""
     msg = Message.query.get(message_id)
     user = msg.user_id
     if user != g.user.id:
@@ -242,6 +242,7 @@ def like_warble(message_id):
 
 @app.route('/users/delete_like/<int:like_id>', methods=["POST"])
 def delete_liked(like_id):
+    """Delete likes from followers warbles"""
     msg = Likes.query.get(like_id)
     db.session.delete(msg)
     db.session.commit()
@@ -251,6 +252,7 @@ def delete_liked(like_id):
 
 @app.route('/users/show_likes')
 def show_liked_warbles():
+    """Show all of a user's liked warbles"""
     if g.user:
         likes = Likes.query.all()
         following_ids = [f.id for f in g.user.following] + [g.user.id]
